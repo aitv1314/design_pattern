@@ -5,6 +5,7 @@
 #define West "west"
 #define East "east"
 
+/********************************************************/
 class Maze {
  public:
   Maze() {}
@@ -23,22 +24,16 @@ class Door {
  public:
   Door(Room* r1, Room* r2) {}
 };
+/********************************************************/
 
+/********************************************************/
 class MazeGame {
  public:
   MazeGame() {}
 
+  friend class MazeFactory;
+
   Maze* MazeGame::CreateMaze(MazeFactory& factory);
-};
-
-class MazeFactory {
- public:
-  MazeFactory() {}
-
-  virtual Maze* MakeMaze() const { return new Maze; }
-  virtual Wall* MakeWall() const { return new Wall; }
-  virtual Room* MakeRoom(int n) const { return new Room(n); }
-  virtual Door* MakeDoor(Room* r1, Room* r2) const { return new Door(r1, r2); }
 };
 
 Maze* MazeGame::CreateMaze(MazeFactory& factory) {
@@ -60,23 +55,70 @@ Maze* MazeGame::CreateMaze(MazeFactory& factory) {
   r2->SetSide(West, aDoor);
   r2->SetSide(East, factory.MakeWall());
 }
+/********************************************************/
+
+/********************************************************/
+class MazeFactory {
+ public:
+  MazeFactory() {}
+
+  virtual Maze* MakeMaze() const { return new Maze; }
+  virtual Wall* MakeWall() const { return new Wall; }
+  virtual Room* MakeRoom(int n) const { return new Room(n); }
+  virtual Door* MakeDoor(Room* r1, Room* r2) const { return new Door(r1, r2); }
+};
 
 // 定义各种maze抽象工厂
 class EnchantedMazeFactory : public MazeFactory {
  public:
-  EnchantedMazeFactory();
+  EnchantedMazeFactory() {}
 
   virtual Room* MakeRoom(int n) const { return new EnchantedRoom(n, CastSpell()); }
   virtual Door* MakeDoor(Room* r1, Room* r2) const { return new DoorNeddingSpell(r1, r2); }
 
  protected:
-  Spell* CastSpell() const;
+  Spell* CastSpell() const {}
+};
+
+class Spell {
+ public:
+  Spell() {}
+
+  // xxx
+};
+
+class EnchantedRoom : public Room {
+ public:
+  EnchantedRoom(int n, Spell* s) : Room(n) {}
+
+  // xxx
+};
+
+class DoorNeddingSpell : public Door {
+ public:
+  DoorNeddingSpell(Room* r1, Room* r2) : Door(r1, r2) {}
+
+  // xxx
 };
 
 class BoomedMazeFactory : public MazeFactory {
  public:
-  BoomedMazeFactory();
+  BoomedMazeFactory() {}
 
   virtual Wall* MakeWall() const { return new BoomedWall; }
-  virtual Room* MakeRoom(int n) const { return new RoomWithBoom(n); }
+  virtual Room* MakeRoom(int n) const { return new BoomRoom(n); }
 };
+
+class BoomedWall : public Wall {
+ public:
+  BoomedWall() {}
+
+  // xxx
+};
+class BoomRoom : public Room {
+ public:
+  BoomRoom(int n) : Room(n) {}
+
+  // xxx
+};
+/********************************************************/
